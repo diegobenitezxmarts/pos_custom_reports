@@ -14,7 +14,7 @@ class SaleDetailsReportInherit(models.AbstractModel):
 
         # Buscar tus tickets
         ticket_logs = self.env['ticket.scanning.log'].search([
-            ('status', '=', 'approved'), 
+            ('status', '=', 'approved'),   # si tu valor en BD es 'approved'
             ('consumption_date', '>=', start_date),
             ('consumption_date', '<=', end_date),
         ])
