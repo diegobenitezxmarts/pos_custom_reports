@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Heredar el informe original -->
+    <template id="report_saledetails_inherit" inherit_id="point_of_sale.report_saledetails">
+        
+        <!-- Eliminar Impuestos -->
+        <xpath expr="//t[@t-if='taxes']" position="replace"/>
+        
+        <!-- Agregar Salidas de Efectivo -->
+        <xpath expr="//t[@t-if='payments']" position="after">
+            <t t-if="payments" id="cash_moves">
+                <h3>Salidas Manuales de Efectivo</h3>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th class="text-start">Método</th>
+                            <th class="text-start">Descripción</th>
+                            <th class="text-end">Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-set="total_cash_out" t-value="0"/>
+                        <tr t-foreach="payments" t-as="method">
+                            <t t-foreach="method.get('cash_moves', [])" t-as="move">
+                                <t t-if="'out' in move.get('name', '').lower() or move['amount'] &amp;lt; 0">
+                                    <tr>
+                                        <td><span t-out="method.get('name', '')"/></td>
+                                        <td><span t-out="move.get('name', '')"/></td>
+                                        <td class="text-end">
+                                            <span t-if="currency['position']">
+                                                <span t-out="abs(move['amount'])"/> 
+                                                <span t-out="currency['symbol']"/>
+                                            </span>
+                                            <span t-else="">
+                                                <span t-out="currency['symbol']"/>
+                                                <span t-out="abs(move['amount'])"/>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <t t-set="total_cash_out" t-value="total_cash_out + abs(move['amount'])"/>
+                                </t>
+                            </t>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-end"><strong>Total Salidas</strong></td>
+                            <td class="text-end">
+                                <span t-if="currency['position']">
+                                    <strong><span t-out="total_cash_out"/><span t-out="currency['symbol']"/></strong>
+                                </span>
+                                <span t-else="">
+                                    <strong><span t-out="currency['symbol']"/><span t-out="total_cash_out"/></strong>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </t>
+        </xpath>
+        
+        <!-- Agregar Tickets Consumidos Aprobados -->
+        <xpath expr="//t[@t-if='payments']" position="after">
+            <t t-if="ticket_scanning_data" id="ticket_scanning_section">
+                <h3>Tickets Consumidos (Aprobados)</h3>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th class="text-start">Producto</th>
+                            <th class="text-end">Cantidad Aprobada</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="ticket_scanning_data" t-as="product">
+                            <td><span t-out="product['name']"/></td>
+                            <td class="text-end"><span t-out="product['qty']"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </t>
+        </xpath>
+        
+    </template>
+</odoo>
