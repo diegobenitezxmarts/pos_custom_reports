@@ -22,7 +22,7 @@
                         <t t-set="total_cash_out" t-value="0"/>
                         <tr t-foreach="payments" t-as="method">
                             <t t-foreach="method.get('cash_moves', [])" t-as="move">
-                                <t t-if="'out' in move.get('name', '').lower() or move['amount'] &amp;lt; 0">
+                                <t t-if="'out' in move.get('name', '').lower() or move['amount'] < 0">
                                     <tr>
                                         <td><span t-out="method.get('name', '')"/></td>
                                         <td><span t-out="move.get('name', '')"/></td>
