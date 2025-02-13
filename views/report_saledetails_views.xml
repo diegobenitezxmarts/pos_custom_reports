@@ -9,7 +9,7 @@
         <!-- Agregar Salidas de Efectivo -->
         <xpath expr="//t[@t-if='payments']" position="after">
             <t t-if="payments" id="cash_moves">
-                <h3>Salidas Manuales de Efectivo</h3>
+                <h3>Gastos Operativos (Salidas de efectivo)</h3>
                 <table class="table table-sm">
                     <thead>
                         <tr>
@@ -22,7 +22,7 @@
                         <t t-set="total_cash_out" t-value="0"/>
                         <tr t-foreach="payments" t-as="method">
                             <t t-foreach="method.get('cash_moves', [])" t-as="move">
-                                <t t-if="'out' in move.get('name', '').lower() or move['amount'] < 0">
+                                <t t-if="'out' in move.get('name', '').lower() or move['amount'] &lt; 0">
                                     <tr>
                                         <td><span t-out="method.get('name', '')"/></td>
                                         <td><span t-out="move.get('name', '')"/></td>
@@ -60,12 +60,12 @@
         <!-- Agregar Tickets Consumidos Aprobados -->
         <xpath expr="//t[@t-if='payments']" position="after">
             <t t-if="ticket_scanning_data" id="ticket_scanning_section">
-                <h3>Tickets Consumidos (Aprobados)</h3>
+                <h3>Reporte de Juegos</h3>
                 <table class="table table-sm">
                     <thead>
                         <tr>
                             <th class="text-start">Producto</th>
-                            <th class="text-end">Cantidad Aprobada</th>
+                            <th class="text-end">Cantidad</th>
                         </tr>
                     </thead>
                     <tbody>
