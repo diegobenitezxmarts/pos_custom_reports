@@ -1,33 +1,35 @@
 from odoo import models, api
 
-class PosOrder(models.Model):
-    _inherit = 'pos.order'
+class SaleDetailsReportInherit(models.AbstractModel):
+    _inherit = 'report.point_of_sale.report_saledetails'  # <--- Ojo aquí
 
-    def _get_report_data(self, data):
-        res = super(PosOrder, self)._get_report_data(data)
-        
-        # Obtener fechas del informe
-        start_date = data.get('start_date')
-        end_date = data.get('end_date')
-        
-        # ===== Datos de Tickets Consumidos =====
+    @api.model
+    def _get_report_values(self, docids, data=None):
+        # Llamar método original
+        res = super()._get_report_values(docids, data=data)
+
+        # Recuperar fechas del wizard
+        start_date = data.get('date_start')
+        end_date = data.get('date_stop')
+
+        # Buscar tus tickets
         ticket_logs = self.env['ticket.scanning.log'].search([
-            ('status', '=', 'aprobado'),
+            ('status', '=', 'approved'), 
             ('consumption_date', '>=', start_date),
-            ('consumption_date', '<=', end_date)
+            ('consumption_date', '<=', end_date),
         ])
-        
-        # Agrupar por producto
+
+        # Agrupar
         product_data = {}
         for log in ticket_logs:
-            product_id = log.product_id.id
-            if product_id not in product_data:
-                product_data[product_id] = {
+            pid = log.product_id.id
+            if pid not in product_data:
+                product_data[pid] = {
                     'name': log.product_id.name,
-                    'qty': 0
+                    'qty': 0,
                 }
-            product_data[product_id]['qty'] += 1
-        
+            product_data[pid]['qty'] += 1
+
+        # Agregarlo al diccionario para que el QWeb pueda usar 'ticket_scanning_data'
         res['ticket_scanning_data'] = list(product_data.values())
-        
         return res
